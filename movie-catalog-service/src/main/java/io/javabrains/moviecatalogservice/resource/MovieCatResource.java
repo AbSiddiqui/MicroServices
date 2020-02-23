@@ -21,13 +21,10 @@ import io.javabrains.moviecatalogservice.model.UserRating;
 public class MovieCatResource {
 	@Autowired
     private RestTemplate restTemplate;
-
-	@Autowired
-	private WebClient.Builder builder;
 	
     @RequestMapping("/{userId}")
     public List<CatalogItem> getCatalog(@PathVariable("userId") String userId) {
-       
+    	
         UserRating userRating = restTemplate.getForObject("http://MOVIE-RATING-SERVICES/rating/userRating/" + userId, UserRating.class);
         return userRating.getRatings().stream()
                 .map(rating -> {
@@ -37,7 +34,7 @@ public class MovieCatResource {
 					 */
                 	//MONO: In the future going to give u wat u want
                     Movie movie = restTemplate.getForObject("http://MOVIE-INFO-SERVICES/movies/" + rating.getMovieId(), Movie.class);
-                    return new CatalogItem(movie.getName(), "Description", rating.getRating());
+                    return new CatalogItem(movie.getName(), movie.getDescription(), rating.getRating());
                 })
                 .collect(Collectors.toList());
 
